@@ -46,7 +46,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>): ReactElement {
     return (
-        <html lang="en" className="overflow-x-hidden">
+        <html lang="en" className="overflow-x-hidden" suppressHydrationWarning>
             <body className={`${plusJakartaSans.variable} bg-bg font-sans text-muted antialiased selection:bg-white selection:text-black`}>
                 {children}
             </body>

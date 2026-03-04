@@ -37,6 +37,14 @@ export function ContactSection({
 
         let isCancelled = false;
 
+        const waitForTurnstile = async () => {
+            for (let i = 0; i < 50; i += 1) {
+                if (window.turnstile) return true;
+                await new Promise((resolve) => window.setTimeout(resolve, 100));
+            }
+            return false;
+        };
+
         const renderWidget = () => {
             if (isCancelled || !window.turnstile || !turnstileRef.current) return;
 
@@ -54,22 +62,20 @@ export function ContactSection({
             });
         };
 
-        if (window.turnstile) {
-            renderWidget();
-        } else {
-            const existingScript = document.querySelector<HTMLScriptElement>("script[data-turnstile='true']");
-            if (existingScript) {
-                existingScript.addEventListener("load", renderWidget, { once: true });
-            } else {
-                const script = document.createElement("script");
-                script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-                script.async = true;
-                script.defer = true;
-                script.dataset.turnstile = "true";
-                script.onload = renderWidget;
-                document.head.appendChild(script);
-            }
+        const existingScript = document.querySelector<HTMLScriptElement>("script[data-turnstile='true']");
+        if (!existingScript) {
+            const script = document.createElement("script");
+            script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+            script.async = true;
+            script.defer = true;
+            script.dataset.turnstile = "true";
+            document.head.appendChild(script);
         }
+
+        waitForTurnstile().then((ready) => {
+            if (!ready || isCancelled) return;
+            renderWidget();
+        });
 
         return () => {
             isCancelled = true;
@@ -128,7 +134,7 @@ export function ContactSection({
                         {siteKey ? (
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-gray-400">Captcha</label>
-                                <div ref={turnstileRef} className="min-h-16.25" />
+                                <div ref={turnstileRef} className="min-h-[65px]" />
                             </div>
                         ) : null}
                         <button
