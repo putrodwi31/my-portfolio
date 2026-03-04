@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum ProjectCategory {
+  web
+  system
+  ai
+  backend
+  mobile
+  devops
+  uiux
+}
+
+enum InfoSection {
+  education
+  organization
+  award
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SiteSetting {
+  id                  Int      @id
+  siteTitle           String
+  siteDescription     String
+  heroBadge           String
+  heroName            String
+  heroRole            String
+  heroDescription     String
+  aboutDescription    String
+  resumeUrl           String
+  githubUrl           String
+  linkedinUrl         String?
+  instagramUrl        String?
+  contactTitle        String
+  contactDescription  String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model TechStackItem {
+  id        String   @id @default(cuid())
+  name      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WorkExperience {
+  id           String          @id @default(cuid())
+  title        String
+  company      String
+  location     String
+  period       String
+  sortOrder    Int             @default(0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  highlights   WorkHighlight[]
+}
+
+model WorkHighlight {
+  id               String         @id @default(cuid())
+  workExperienceId String
+  text             String
+  sortOrder        Int            @default(0)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  workExperience   WorkExperience @relation(fields: [workExperienceId], references: [id], onDelete: Cascade)
+}
+
+model Project {
+  id          String          @id @default(cuid())
+  category    ProjectCategory
+  title       String          @unique
+  description String
+  image       String
+  repoHref    String?
+  repoApi     String?
+  demoHref    String?
+  sortOrder   Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  technologies ProjectTech[]
+  features     ProjectFeature[]
+}
+
+model ProjectTech {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectFeature {
+  id        String   @id @default(cuid())
+  projectId String
+  text      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model InfoEntry {
+  id         String      @id @default(cuid())
+  section    InfoSection
+  groupTitle String
+  groupIcon  String
+  title      String
+  subtitle   String
+  period     String
+  groupOrder Int         @default(0)
+  sortOrder  Int         @default(0)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}

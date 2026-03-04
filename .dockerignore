@@ -1,0 +1,13 @@
+.git
+.github
+.next
+node_modules
+out
+.env
+.env.local
+.env.production
+.env.*.local
+npm-debug.log*
+prisma/*.db
+prisma/*.db-journal
+public/uploads
