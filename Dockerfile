@@ -1,11 +1,17 @@
-FROM node:22-bookworm-slim AS deps
+FROM node:22-bookworm-slim AS base
+
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+FROM base AS deps
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
 RUN npm ci
 
-FROM node:22-bookworm-slim AS builder
+FROM base AS builder
 
 WORKDIR /app
 ENV DATABASE_URL=file:/tmp/build.db
@@ -16,7 +22,7 @@ COPY . .
 RUN npm run db:generate
 RUN npm run build
 
-FROM node:22-bookworm-slim AS runner
+FROM base AS runner
 
 WORKDIR /app
 
