@@ -15,6 +15,8 @@ FROM base AS builder
 
 WORKDIR /app
 ENV DATABASE_URL=file:/tmp/build.db
+ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
+ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
