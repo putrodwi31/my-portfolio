@@ -1,6 +1,7 @@
 node_modules
 .next
 out
+.vercel
 .env
 .env.production
 .env.local
@@ -11,3 +12,14 @@ prisma/dev.db-journal
 public/uploads
 *.db
 *.db-journal
+tsconfig.tsbuildinfo
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+__MACOSX

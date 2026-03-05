@@ -1,5 +1,6 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import type { SubmitEvent, SubmitEventHandler } from "react";
 import { useState } from "react";
 
@@ -7,32 +8,30 @@ export function AdminLoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const loginMutation = useMutation({
+        mutationFn: async (payload: { email: string; password: string }) => {
+            const response = await fetch("/api/admin/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            const data = (await response.json()) as { error?: string };
+            if (!response.ok) {
+                throw new Error(data.error ?? "Login failed.");
+            }
+        },
+    });
 
     const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event: SubmitEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
         setError("");
-        setIsSubmitting(true);
 
         try {
-            const response = await fetch("/api/admin/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-            });
-
-            const payload = (await response.json()) as { error?: string };
-
-            if (!response.ok) {
-                setError(payload.error ?? "Login failed.");
-                return;
-            }
-
+            await loginMutation.mutateAsync({ email, password });
             window.location.href = "/admin";
-        } catch {
-            setError("Unable to login. Please try again.");
-        } finally {
-            setIsSubmitting(false);
+        } catch (cause) {
+            setError(cause instanceof Error ? cause.message : "Unable to login. Please try again.");
         }
     };
 
@@ -65,10 +64,10 @@ export function AdminLoginForm() {
             {error ? <p className="border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-200">{error}</p> : null}
             <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={loginMutation.isPending}
                 className="w-full bg-white px-5 py-3 font-semibold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-70"
             >
-                {isSubmitting ? "Signing In..." : "Sign In"}
+                {loginMutation.isPending ? "Signing In..." : "Sign In"}
             </button>
         </form>
     );

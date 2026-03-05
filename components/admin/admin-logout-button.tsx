@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 export function AdminLogoutButton() {
-  const [isLoading, setIsLoading] = useState(false);
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      await fetch("/api/admin/logout", { method: "POST" });
+    },
+  });
 
   const handleLogout = async () => {
-    setIsLoading(true);
-    await fetch("/api/admin/logout", { method: "POST" });
+    await logoutMutation.mutateAsync();
     window.location.href = "/admin/login";
   };
 
@@ -15,10 +18,10 @@ export function AdminLogoutButton() {
     <button
       type="button"
       onClick={handleLogout}
-      disabled={isLoading}
+      disabled={logoutMutation.isPending}
       className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white transition hover:border-white hover:bg-white hover:text-black disabled:opacity-60"
     >
-      {isLoading ? "Signing Out..." : "Logout"}
+      {logoutMutation.isPending ? "Signing Out..." : "Logout"}
     </button>
   );
 }

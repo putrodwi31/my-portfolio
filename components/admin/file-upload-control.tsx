@@ -1,5 +1,6 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { useId, useState } from "react";
 
 type FileUploadControlProps = {
@@ -12,17 +13,9 @@ type FileUploadControlProps = {
 
 export function FileUploadControl({ accept, buttonLabel, currentValue, kind, onUploaded }: FileUploadControlProps) {
     const inputId = useId();
-    const [isUploading, setIsUploading] = useState(false);
     const [message, setMessage] = useState("");
-
-    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        setIsUploading(true);
-        setMessage("");
-
-        try {
+    const uploadMutation = useMutation({
+        mutationFn: async (file: File) => {
             const formData = new FormData();
             formData.append("file", file);
             formData.append("kind", kind);
@@ -35,17 +28,27 @@ export function FileUploadControl({ accept, buttonLabel, currentValue, kind, onU
             const payload = (await response.json()) as { error?: string; url?: string };
 
             if (!response.ok || !payload.url) {
-                setMessage(payload.error ?? "Upload failed.");
-                return;
+                throw new Error(payload.error ?? "Upload failed.");
             }
 
-            onUploaded(payload.url);
+            return payload.url;
+        },
+    });
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setMessage("");
+
+        try {
+            const uploadedUrl = await uploadMutation.mutateAsync(file);
+            onUploaded(uploadedUrl);
             setMessage("Upload successful.");
-        } catch {
-            setMessage("Upload failed.");
+        } catch (cause) {
+            setMessage(cause instanceof Error ? cause.message : "Upload failed.");
         } finally {
             event.target.value = "";
-            setIsUploading(false);
         }
     };
 
@@ -58,9 +61,16 @@ export function FileUploadControl({ accept, buttonLabel, currentValue, kind, onU
                     htmlFor={inputId}
                     className="inline-flex cursor-pointer items-center border border-border px-4 py-2 text-sm text-white transition hover:border-white"
                 >
-                    {isUploading ? "Uploading..." : buttonLabel}
+                    {uploadMutation.isPending ? "Uploading..." : buttonLabel}
                 </label>
-                <input id={inputId} type="file" accept={accept} className="hidden" onChange={handleFileChange} disabled={isUploading} />
+                <input
+                    id={inputId}
+                    type="file"
+                    accept={accept}
+                    className="hidden"
+                    onChange={handleFileChange}
+                    disabled={uploadMutation.isPending}
+                />
                 {currentValue ? (
                     <a
                         href={currentValue}

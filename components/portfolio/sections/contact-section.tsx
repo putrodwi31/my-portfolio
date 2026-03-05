@@ -1,90 +1,61 @@
-import { useEffect, useRef, type ReactElement, type SubmitEvent } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useCallback, useState, type ReactElement } from "react";
+import { useForm } from "react-hook-form";
 import type { SiteSettings } from "@/components/portfolio/types";
 import { MotionReveal } from "@/components/portfolio/ui/motion-reveal";
 import { SectionShell } from "@/components/portfolio/ui/section-shell";
+import { TurnstileCaptcha } from "@/components/portfolio/ui/turnstile-captcha";
+import { contactFormSchema, TContactForm } from "@/validations/contacts.validation";
 
 type ContactSectionProps = {
     siteSettings: SiteSettings;
-    email: string;
-    message: string;
-    captchaToken: string;
     isSubmitting: boolean;
-    onEmailChange: (value: string) => void;
-    onMessageChange: (value: string) => void;
-    onCaptchaTokenChange: (value: string) => void;
-    onSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>;
+    onSubmit: (payload: TContactForm) => Promise<boolean>;
 };
 
-export function ContactSection({
-    siteSettings,
-    email,
-    message,
-    captchaToken,
-    isSubmitting,
-    onEmailChange,
-    onMessageChange,
-    onCaptchaTokenChange,
-    onSubmit,
-}: ContactSectionProps): ReactElement {
-    const turnstileRef = useRef<HTMLDivElement | null>(null);
-    const widgetIdRef = useRef<string | null>(null);
-    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+export function ContactSection({ siteSettings, isSubmitting, onSubmit }: ContactSectionProps): ReactElement {
+    const siteKey: string | undefined = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    const requireCaptcha: boolean = Boolean(siteKey);
+    const [captchaResetKey, setCaptchaResetKey] = useState(0);
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        setError,
+        clearErrors,
+        reset,
+        watch,
+        formState: { errors },
+    } = useForm<TContactForm>({
+        resolver: zodResolver(contactFormSchema),
+        defaultValues: { email: "", message: "", captchaToken: "" },
+    });
+    const captchaToken: string | undefined = watch("captchaToken");
 
-    useEffect(() => {
-        if (!siteKey || !turnstileRef.current) {
-            return undefined;
+    const onCaptchaTokenChange: (token: string) => void = useCallback(
+        (token: string): void => {
+            setValue("captchaToken", token, { shouldValidate: requireCaptcha });
+            if (token) {
+                clearErrors("captchaToken");
+            }
+        },
+        [clearErrors, requireCaptcha, setValue],
+    );
+
+    const onFormSubmit = handleSubmit(async (payload) => {
+        if (requireCaptcha && !payload.captchaToken?.trim()) {
+            setError("captchaToken", { type: "manual", message: "Please complete captcha verification." });
+            return;
         }
 
-        let isCancelled = false;
+        const isSuccess: boolean = await onSubmit(payload);
+        if (!isSuccess) return;
 
-        const waitForTurnstile = async () => {
-            for (let i = 0; i < 50; i += 1) {
-                if (window.turnstile) return true;
-                await new Promise((resolve) => window.setTimeout(resolve, 100));
-            }
-            return false;
-        };
-
-        const renderWidget = () => {
-            if (isCancelled || !window.turnstile || !turnstileRef.current) return;
-
-            if (widgetIdRef.current) {
-                window.turnstile.remove(widgetIdRef.current);
-                widgetIdRef.current = null;
-            }
-
-            widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
-                sitekey: siteKey,
-                theme: "dark",
-                callback: (token: string) => onCaptchaTokenChange(token),
-                "expired-callback": () => onCaptchaTokenChange(""),
-                "error-callback": () => onCaptchaTokenChange(""),
-            });
-        };
-
-        const existingScript = document.querySelector<HTMLScriptElement>("script[data-turnstile='true']");
-        if (!existingScript) {
-            const script = document.createElement("script");
-            script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-            script.async = true;
-            script.defer = true;
-            script.dataset.turnstile = "true";
-            document.head.appendChild(script);
+        reset({ email: "", message: "", captchaToken: "" });
+        if (requireCaptcha) {
+            setCaptchaResetKey((value: number): number => value + 1);
         }
-
-        waitForTurnstile().then((ready) => {
-            if (!ready || isCancelled) return;
-            renderWidget();
-        });
-
-        return () => {
-            isCancelled = true;
-            if (window.turnstile && widgetIdRef.current) {
-                window.turnstile.remove(widgetIdRef.current);
-                widgetIdRef.current = null;
-            }
-        };
-    }, [onCaptchaTokenChange, siteKey]);
+    });
 
     return (
         <SectionShell id="contact" className="border-t border-border bg-surface py-24">
@@ -94,49 +65,47 @@ export function ContactSection({
                 </MotionReveal>
                 <MotionReveal delay={0.1}>
                     <p className="mb-10 text-lg text-gray-400">
-                        {siteSettings.contactDescription.split("\n").map((line, index) => (
-                            <span key={`${line}-${index}`}>
-                                {index > 0 ? <br /> : null}
-                                {line}
-                            </span>
-                        ))}
+                        {siteSettings.contactDescription.split("\n").map(
+                            (line: string, index: number): ReactElement => (
+                                <span key={`${line}-${index}`}>
+                                    {index > 0 ? <br /> : null}
+                                    {line}
+                                </span>
+                            ),
+                        )}
                     </p>
                 </MotionReveal>
 
                 <MotionReveal className="mb-2 border border-border bg-bg p-8 text-left" variant="zoom-in">
-                    <form className="space-y-6" onSubmit={onSubmit}>
+                    <form className="space-y-6" onSubmit={onFormSubmit}>
                         <div className="grid gap-6 md:grid-cols-1">
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-gray-400">Email</label>
                                 <input
                                     type="email"
-                                    name="email"
-                                    required
-                                    value={email}
-                                    onChange={(event) => onEmailChange(event.target.value)}
+                                    {...register("email")}
                                     className="w-full border border-border bg-zinc-900 p-3 text-white transition focus:border-white focus:outline-none"
                                     placeholder="Enter Your Email"
                                 />
+                                {errors.email ? <p className="mt-2 text-sm text-red-400">{errors.email.message}</p> : null}
                             </div>
                         </div>
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-400">Message</label>
                             <textarea
-                                name="message"
+                                {...register("message")}
                                 rows={4}
-                                required
-                                value={message}
-                                onChange={(event) => onMessageChange(event.target.value)}
                                 className="w-full border border-border bg-zinc-900 p-3 text-white transition focus:border-white focus:outline-none"
                                 placeholder="Enter Your Message"
                             />
+                            {errors.message ? <p className="mt-2 text-sm text-red-400">{errors.message.message}</p> : null}
                         </div>
-                        {siteKey ? (
-                            <div>
-                                <label className="mb-2 block text-sm font-medium text-gray-400">Captcha</label>
-                                <div ref={turnstileRef} className="min-h-[65px]" />
-                            </div>
-                        ) : null}
+                        <TurnstileCaptcha
+                            siteKey={siteKey}
+                            onTokenChange={onCaptchaTokenChange}
+                            errorMessage={errors.captchaToken?.message}
+                            resetKey={captchaResetKey}
+                        />
                         <button
                             type="submit"
                             disabled={isSubmitting || (Boolean(siteKey) && !captchaToken)}

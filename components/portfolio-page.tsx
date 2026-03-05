@@ -1,6 +1,6 @@
 "use client";
 
-import type { SubmitEvent } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { navItems } from "@/components/portfolio/data";
 import { AboutSection } from "@/components/portfolio/sections/about-section";
@@ -16,6 +16,7 @@ import { ProjectModal } from "@/components/portfolio/ui/project-modal";
 import { SiteNav } from "@/components/portfolio/ui/site-nav";
 import { SupportModal } from "@/components/portfolio/ui/support-modal";
 import { ToastNotification } from "@/components/portfolio/ui/toast-notification";
+import { TContactForm } from "@/validations/contacts.validation";
 
 type PortfolioPageProps = {
     content: PortfolioContent;
@@ -28,12 +29,7 @@ export default function PortfolioPage({ content }: PortfolioPageProps) {
     const [selectedFilter, setSelectedFilter] = useState<ProjectCategory>("all");
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const [supportOpen, setSupportOpen] = useState(false);
-    const [repoStats, setRepoStats] = useState<Record<string, RepoStats>>({});
-    const [formState, setFormState] = useState({ email: "", message: "" });
-    const [captchaToken, setCaptchaToken] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
-    const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
     const filteredProjects =
         selectedFilter === "all" ? content.projects : content.projects.filter((project) => project.category === selectedFilter);
@@ -71,11 +67,10 @@ export default function PortfolioPage({ content }: PortfolioPageProps) {
         };
     }, [selectedProject, supportOpen]);
 
-    useEffect(() => {
-        let isCancelled = false;
-
-        const loadStats = async () => {
-            const entries = await Promise.all(
+    const { data: repoStats = {} } = useQuery<Record<string, RepoStats>>({
+        queryKey: ["repo-stats", content.projects],
+        queryFn: async () => {
+            const entries: Array<[string, RepoStats] | null> = await Promise.all(
                 content.projects.map(async (project) => {
                     if (!project.repoHref?.trim() || !project.repoApi?.trim()) {
                         return null;
@@ -105,16 +100,11 @@ export default function PortfolioPage({ content }: PortfolioPageProps) {
                 }),
             );
 
-            if (isCancelled) return;
             const validEntries = entries.filter((entry): entry is [string, RepoStats] => entry !== null);
-            setRepoStats(Object.fromEntries(validEntries));
-        };
-
-        loadStats().catch(() => undefined);
-        return () => {
-            isCancelled = true;
-        };
-    }, [content.projects]);
+            return Object.fromEntries(validEntries);
+        },
+        staleTime: 5 * 60 * 1000,
+    });
 
     useEffect(() => {
         if (!showNotification) return undefined;
@@ -134,21 +124,8 @@ export default function PortfolioPage({ content }: PortfolioPageProps) {
         return () => window.removeEventListener("keydown", onEscape);
     }, []);
 
-    const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
-        if (!formState.email.trim() || !formState.message.trim()) {
-            window.alert("Please fill in all fields");
-            return;
-        }
-
-        if (turnstileSiteKey && !captchaToken) {
-            window.alert("Please complete captcha verification");
-            return;
-        }
-
-        try {
-            setIsSubmitting(true);
+    const contactMutation = useMutation({
+        mutationFn: async (payload: TContactForm) => {
             const response = await fetch("/api/contact", {
                 method: "POST",
                 headers: {
@@ -156,23 +133,26 @@ export default function PortfolioPage({ content }: PortfolioPageProps) {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    email: formState.email,
-                    message: formState.message,
-                    captchaToken,
+                    email: payload.email,
+                    message: payload.message,
+                    captchaToken: payload.captchaToken,
                 }),
             });
 
             if (!response.ok) {
                 throw new Error("Failed to send message");
             }
+        },
+    });
 
-            setFormState({ email: "", message: "" });
-            setCaptchaToken("");
+    const handleSubmit = async (payload: TContactForm) => {
+        try {
+            await contactMutation.mutateAsync(payload);
             setShowNotification(true);
+            return true;
         } catch {
             window.alert("Error sending message");
-        } finally {
-            setIsSubmitting(false);
+            return false;
         }
     };
 
@@ -218,17 +198,7 @@ export default function PortfolioPage({ content }: PortfolioPageProps) {
                 groups={content.organizationGroups}
             />
             <InfoGroupsSection id="awards" className="border-t border-border bg-surface/20 py-24" groups={content.awardGroups} />
-            <ContactSection
-                siteSettings={content.siteSettings}
-                email={formState.email}
-                message={formState.message}
-                captchaToken={captchaToken}
-                isSubmitting={isSubmitting}
-                onEmailChange={(email) => setFormState((value) => ({ ...value, email }))}
-                onMessageChange={(message) => setFormState((value) => ({ ...value, message }))}
-                onCaptchaTokenChange={setCaptchaToken}
-                onSubmit={handleSubmit}
-            />
+            <ContactSection siteSettings={content.siteSettings} isSubmitting={contactMutation.isPending} onSubmit={handleSubmit} />
             <SiteFooter onOpenSupport={() => setSupportOpen(true)} />
 
             {selectedProject ? <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} /> : null}

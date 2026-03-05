@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ReactQueryProvider } from "@/components/providers/react-query-provider";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ReactElement } from "react";
@@ -51,7 +52,7 @@ export default function RootLayout({
                 suppressHydrationWarning
                 className={`${plusJakartaSans.variable} bg-bg font-sans text-muted antialiased selection:bg-white selection:text-black`}
             >
-                {children}
+                <ReactQueryProvider>{children}</ReactQueryProvider>
             </body>
         </html>
     );

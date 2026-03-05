@@ -44,13 +44,13 @@ export function AboutSection({ siteSettings, techStack }: AboutSectionProps): Re
                     </div>
                 </MotionReveal>
 
-                <MotionReveal className="hidden h-full w-full items-center justify-center md:flex" variant="fade-left">
+                <MotionReveal className="flex w-full items-center justify-center md:h-full" variant="fade-left">
                     <Image
                         src="/assets/images/about-photoo.png"
                         alt="Profile Photo"
                         width={900}
                         height={1200}
-                        className="h-full w-full object-cover shadow-lg"
+                        className="h-auto w-full max-w-sm object-cover shadow-lg md:h-full md:max-w-none"
                     />
                 </MotionReveal>
             </div>

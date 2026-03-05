@@ -7,6 +7,7 @@ interface Window {
             options: {
                 sitekey: string;
                 theme?: "light" | "dark" | "auto";
+                size?: "normal" | "compact" | "flexible";
                 callback?: (token: string) => void;
                 "expired-callback"?: () => void;
                 "error-callback"?: () => void;
