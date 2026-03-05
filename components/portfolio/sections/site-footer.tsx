@@ -15,9 +15,13 @@ export function SiteFooter({ onOpenSupport }: SiteFooterProps): ReactElement {
                     </span>
                     <span className="text-sm font-semibold tracking-wide text-green-400">Uptime Status</span>
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-300">
                     Putro Dwi Mulyo <span className="mx-2">|</span>
-                    <button type="button" onClick={onOpenSupport} className="text-gray-500 hover:underline">
+                    <button
+                        type="button"
+                        onClick={onOpenSupport}
+                        className="text-gray-200 underline-offset-4 transition hover:text-white hover:underline"
+                    >
                         Support Me
                     </button>
                 </p>

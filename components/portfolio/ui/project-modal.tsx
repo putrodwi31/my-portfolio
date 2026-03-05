@@ -27,6 +27,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps): ReactElem
                             <Image
                                 src={project.image}
                                 alt={project.title}
+                                loading="lazy"
                                 fill
                                 sizes="(max-width: 768px) 100vw, 50vw"
                                 className="object-cover"

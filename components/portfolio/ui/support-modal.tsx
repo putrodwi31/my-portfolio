@@ -27,6 +27,7 @@ export function SupportModal({ onClose }: SupportModalProps): ReactElement {
                         <Image
                             src="/assets/images/dana.jpeg"
                             alt="Dana Support"
+                            loading="lazy"
                             width={900}
                             height={900}
                             className="h-full w-full object-contain"

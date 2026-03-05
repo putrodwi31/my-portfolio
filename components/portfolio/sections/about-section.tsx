@@ -48,6 +48,7 @@ export function AboutSection({ siteSettings, techStack }: AboutSectionProps): Re
                     <Image
                         src="/assets/images/about-photoo.png"
                         alt="Profile Photo"
+                        loading="lazy"
                         width={900}
                         height={1200}
                         className="h-auto w-full max-w-sm object-cover shadow-lg md:h-full md:max-w-none"

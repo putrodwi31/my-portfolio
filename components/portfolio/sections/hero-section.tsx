@@ -35,13 +35,22 @@ export function HeroSection({ siteSettings }: HeroSectionProps): ReactElement {
                         </a>
                     </div>
                     <div className="mt-10 flex gap-6">
-                        <a href={siteSettings.githubUrl} className="text-2xl transition hover:text-white" target="_blank" rel="noreferrer">
+                        <a
+                            href={siteSettings.githubUrl}
+                            aria-label="Visit Putro Dwi Mulyo GitHub profile (opens in a new tab)"
+                            title="GitHub"
+                            className="text-2xl transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
                             <FaGithub />
                         </a>
                         {siteSettings.linkedinUrl ? (
                             <a
                                 href={siteSettings.linkedinUrl}
-                                className="text-2xl transition hover:text-white"
+                                aria-label="Visit Putro Dwi Mulyo LinkedIn profile (opens in a new tab)"
+                                title="LinkedIn"
+                                className="text-2xl transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
                                 target="_blank"
                                 rel="noreferrer"
                             >
@@ -51,7 +60,9 @@ export function HeroSection({ siteSettings }: HeroSectionProps): ReactElement {
                         {siteSettings.instagramUrl ? (
                             <a
                                 href={siteSettings.instagramUrl}
-                                className="text-2xl transition hover:text-white"
+                                aria-label="Visit Putro Dwi Mulyo Instagram profile (opens in a new tab)"
+                                title="Instagram"
+                                className="text-2xl transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
                                 target="_blank"
                                 rel="noreferrer"
                             >

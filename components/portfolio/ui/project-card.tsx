@@ -22,6 +22,7 @@ export function ProjectCard({ project, index, stats, onClick }: ProjectCardProps
                     <Image
                         src={project.image}
                         alt={project.title}
+                        loading="lazy"
                         fill
                         sizes="(max-width: 1024px) 100vw, 33vw"
                         className="object-cover grayscale transition duration-700 group-hover:scale-105 group-hover:grayscale-0"
