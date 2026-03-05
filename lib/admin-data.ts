@@ -102,6 +102,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
             heroRole: siteSetting.heroRole,
             heroDescription: siteSetting.heroDescription,
             aboutDescription: siteSetting.aboutDescription,
+            aboutImageUrl: siteSetting.aboutImageUrl,
             resumeUrl: siteSetting.resumeUrl,
             githubUrl: siteSetting.githubUrl,
             linkedinUrl: siteSetting.linkedinUrl ?? "",

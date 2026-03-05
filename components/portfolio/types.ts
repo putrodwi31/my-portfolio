@@ -52,6 +52,7 @@ export type SiteSettings = {
     heroRole: string;
     heroDescription: string;
     aboutDescription: string;
+    aboutImageUrl: string;
     resumeUrl: string;
     githubUrl: string;
     linkedinUrl: string;

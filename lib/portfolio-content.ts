@@ -78,6 +78,7 @@ function mapSiteSetting(setting: {
     heroRole: string;
     heroDescription: string;
     aboutDescription: string;
+    aboutImageUrl: string;
     resumeUrl: string;
     githubUrl: string;
     linkedinUrl: string | null;
@@ -93,6 +94,7 @@ function mapSiteSetting(setting: {
         heroRole: setting.heroRole,
         heroDescription: setting.heroDescription,
         aboutDescription: setting.aboutDescription,
+        aboutImageUrl: setting.aboutImageUrl,
         resumeUrl: setting.resumeUrl,
         githubUrl: setting.githubUrl,
         linkedinUrl: setting.linkedinUrl ?? "",

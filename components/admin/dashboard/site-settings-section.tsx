@@ -21,6 +21,7 @@ export function SiteSettingsSection({
         defaultValues: initialSiteSettings,
     });
     const resumeUrl: string = watch("resumeUrl");
+    const aboutImageUrl: string = watch("aboutImageUrl");
 
     useEffect((): void => {
         reset(initialSiteSettings);
@@ -50,6 +51,7 @@ export function SiteSettingsSection({
                         ["heroRole", "Hero Role"],
                         ["heroDescription", "Hero Description"],
                         ["aboutDescription", "About Description"],
+                        ["aboutImageUrl", "About Image URL"],
                         ["githubUrl", "GitHub URL"],
                         ["linkedinUrl", "LinkedIn URL"],
                         ["instagramUrl", "Instagram URL"],
@@ -79,6 +81,22 @@ export function SiteSettingsSection({
                             currentValue={resumeUrl}
                             kind="document"
                             onUploaded={(url) => setValue("resumeUrl", url, { shouldDirty: true, shouldValidate: true })}
+                        />
+                    </div>
+                </div>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                    <div className={panelCardClassName}>
+                        <span className="mb-2 block text-sm uppercase tracking-[0.2em] text-gray-400">About Image URL</span>
+                        <input {...register("aboutImageUrl")} className={fieldClassName} />
+                    </div>
+                    <div className={panelCardClassName}>
+                        <span className="mb-2 block text-sm uppercase tracking-[0.2em] text-gray-400">Upload About Image</span>
+                        <FileUploadControl
+                            accept="image/*"
+                            buttonLabel="Upload About Image"
+                            currentValue={aboutImageUrl}
+                            kind="image"
+                            onUploaded={(url) => setValue("aboutImageUrl", url, { shouldDirty: true, shouldValidate: true })}
                         />
                     </div>
                 </div>

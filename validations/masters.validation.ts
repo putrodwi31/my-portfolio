@@ -7,6 +7,7 @@ export const siteSettingsFormSchema = z.object({
     heroRole: z.string().min(1),
     heroDescription: z.string().min(1),
     aboutDescription: z.string().min(1),
+    aboutImageUrl: z.string().min(1),
     resumeUrl: z.string().min(1),
     githubUrl: z.string().min(1),
     linkedinUrl: z.string(),

@@ -218,6 +218,7 @@ async function main() {
             heroDescription: "Welcome to my portfolio. Feel free to explore my work and reach out if you'd like to discuss anything.",
             aboutDescription:
                 "Informatics engineering graduate with a proven track record in leading website development projects and active involvement in organizational initiatives. Skilled in team leadership, web development (Typescript, PHP, JavaScript frameworks & Golang). Passionate about leveraging technical expertise to drive innovative projects.",
+            aboutImageUrl: "/assets/images/about-photoo.png",
             resumeUrl: "/assets/pdf/mycv.pdf",
             githubUrl: "https://github.com/putrodwi31",
             linkedinUrl: "https://www.linkedin.com/in/putrodwi31/",

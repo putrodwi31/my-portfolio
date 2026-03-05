@@ -40,6 +40,7 @@ model SiteSetting {
   heroRole            String
   heroDescription     String
   aboutDescription    String
+  aboutImageUrl       String   @default("/assets/images/about-photoo.png")
   resumeUrl           String
   githubUrl           String
   linkedinUrl         String?

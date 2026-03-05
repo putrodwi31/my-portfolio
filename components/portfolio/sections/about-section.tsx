@@ -46,7 +46,7 @@ export function AboutSection({ siteSettings, techStack }: AboutSectionProps): Re
 
                 <MotionReveal className="flex w-full items-center justify-center md:h-full" variant="fade-left">
                     <Image
-                        src="/assets/images/about-photoo.png"
+                        src={siteSettings.aboutImageUrl}
                         alt="Profile Photo"
                         loading="lazy"
                         width={900}
