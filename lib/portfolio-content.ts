@@ -47,6 +47,29 @@ function normalizeCategory(category: ProjectCategory): Project["category"] {
     return category;
 }
 
+function normalizeProjectImagePath(value: string): string {
+    const trimmed = value.trim();
+    if (!trimmed) return trimmed;
+
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/")) {
+        return trimmed;
+    }
+
+    const normalized = trimmed.replace(/\\/g, "/");
+    const publicUploadsMarker = "/public/uploads/";
+    const markerIndex = normalized.indexOf(publicUploadsMarker);
+    if (markerIndex >= 0) {
+        const relativePath = normalized.slice(markerIndex + "/public/".length);
+        return `/${relativePath.replace(/^\/+/, "")}`;
+    }
+
+    if (normalized.startsWith("uploads/")) {
+        return `/${normalized}`;
+    }
+
+    return normalized;
+}
+
 function mapSiteSetting(setting: {
     siteTitle: string;
     siteDescription: string;
@@ -123,7 +146,7 @@ export async function getPortfolioContent(): Promise<PortfolioContent> {
                 title: project.title,
                 description: project.description,
                 tech: project.technologies.map((item) => item.name),
-                image: project.image,
+                image: normalizeProjectImagePath(project.image),
                 repoHref: project.repoHref ?? undefined,
                 repoApi: project.repoApi ?? undefined,
                 demoHref: project.demoHref ?? undefined,

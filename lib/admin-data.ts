@@ -46,6 +46,29 @@ export type AdminDashboardData = {
     infoEntries: AdminInfoEntryRecord[];
 };
 
+function normalizeProjectImagePath(value: string): string {
+    const trimmed = value.trim();
+    if (!trimmed) return trimmed;
+
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/")) {
+        return trimmed;
+    }
+
+    const normalized = trimmed.replace(/\\/g, "/");
+    const publicUploadsMarker = "/public/uploads/";
+    const markerIndex = normalized.indexOf(publicUploadsMarker);
+    if (markerIndex >= 0) {
+        const relativePath = normalized.slice(markerIndex + "/public/".length);
+        return `/${relativePath.replace(/^\/+/, "")}`;
+    }
+
+    if (normalized.startsWith("uploads/")) {
+        return `/${normalized}`;
+    }
+
+    return normalized;
+}
+
 export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     const [siteSetting, techStack, workExperiences, projects, infoEntries] = await Promise.all([
         prisma.siteSetting.findUnique({ where: { id: 1 } }),
@@ -101,7 +124,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
             category: project.category,
             title: project.title,
             description: project.description,
-            image: project.image,
+            image: normalizeProjectImagePath(project.image),
             repoHref: project.repoHref ?? "",
             repoApi: project.repoApi ?? "",
             demoHref: project.demoHref ?? "",
