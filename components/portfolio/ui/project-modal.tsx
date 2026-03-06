@@ -2,7 +2,7 @@ import Image from "next/image";
 import { FaGithub, FaTimes } from "react-icons/fa";
 import { FaUpRightFromSquare } from "react-icons/fa6";
 import type { Project } from "@/components/portfolio/types";
-import { ReactElement } from "react";
+import { ReactElement, useEffect } from "react";
 
 type ProjectModalProps = {
     project: Project;
@@ -10,13 +10,21 @@ type ProjectModalProps = {
 };
 
 export function ProjectModal({ project, onClose }: ProjectModalProps): ReactElement {
+    // Prevent body scrolling when the modal is open
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, []);
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm" onClick={onClose}>
-            <div className="relative w-full max-w-5xl border border-border bg-bg p-0 md:p-6" onClick={(event) => event.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 py-6 backdrop-blur-sm" onClick={onClose}>
+            <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto border border-border bg-bg p-0 shadow-2xl md:p-6" onClick={(event) => event.stopPropagation()}>
                 <button
                     type="button"
                     aria-label="Close project modal"
-                    className="absolute top-3 right-3 text-gray-400 transition hover:text-white"
+                    className="absolute top-3 right-3 z-10 rounded-full bg-black/40 p-2 text-gray-300 backdrop-blur-sm transition hover:bg-black/80 hover:text-white md:bg-transparent md:p-0 md:backdrop-blur-none"
                     onClick={onClose}
                 >
                     <FaTimes className="text-xl" />
