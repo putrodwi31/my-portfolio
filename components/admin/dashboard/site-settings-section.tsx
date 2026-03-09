@@ -2,9 +2,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ReactElement, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { FaFile, FaImage } from "react-icons/fa6";
 import { FileUploadControl } from "@/components/admin/file-upload-control";
 import type { SiteSettings } from "@/components/portfolio/types";
-import { SectionCard, fieldClassName, panelCardClassName, primaryButtonClassName } from "@/components/admin/dashboard/shared";
+import {
+    SectionCard,
+    fieldClassName,
+    textareaClassName,
+    panelCardClassName,
+    primaryButtonClassName,
+} from "@/components/admin/dashboard/shared";
 import { siteSettingsFormSchema } from "@/validations/masters.validation";
 
 export function SiteSettingsSection({
@@ -42,62 +49,120 @@ export function SiteSettingsSection({
             }
         >
             <form id={formId} onSubmit={handleSubmit((value) => onSave(value))}>
-                <div className="grid gap-4 md:grid-cols-2">
-                    {[
-                        ["siteTitle", "Site Title"],
-                        ["siteDescription", "Site Description"],
-                        ["heroBadge", "Hero Badge"],
-                        ["heroName", "Hero Name"],
-                        ["heroRole", "Hero Role"],
-                        ["heroDescription", "Hero Description"],
-                        ["aboutDescription", "About Description"],
-                        ["aboutImageUrl", "About Image URL"],
-                        ["githubUrl", "GitHub URL"],
-                        ["linkedinUrl", "LinkedIn URL"],
-                        ["instagramUrl", "Instagram URL"],
-                        ["contactTitle", "Contact Title"],
-                        ["contactDescription", "Contact Description"],
-                    ].map(([key, label]) => (
-                        <label key={key} className={key.includes("Description") ? "md:col-span-2" : ""}>
-                            <span className="mb-2 block text-sm uppercase tracking-[0.2em] text-gray-400">{label}</span>
-                            {key.includes("Description") ? (
-                                <textarea rows={4} {...register(key as keyof SiteSettings)} className={fieldClassName} />
-                            ) : (
-                                <input {...register(key as keyof SiteSettings)} className={fieldClassName} />
-                            )}
-                        </label>
-                    ))}
-                </div>
-                <div className="mt-6 grid gap-4 border-t border-white/8 pt-6 md:grid-cols-2">
-                    <div className={panelCardClassName}>
-                        <span className="mb-2 block text-sm uppercase tracking-[0.2em] text-gray-400">Resume URL</span>
-                        <input {...register("resumeUrl")} className={fieldClassName} />
+                <div className="space-y-6">
+                    <div className="space-y-4">
+                        <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-cyan-400/90">Basic Information</h3>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            {[
+                                ["siteTitle", "Site Title"],
+                                ["heroName", "Hero Name"],
+                            ].map(([key, label]) => (
+                                <label key={key}>
+                                    <span className="mb-2 block text-sm font-medium text-gray-300">{label}</span>
+                                    <input {...register(key as keyof SiteSettings)} className={fieldClassName} />
+                                </label>
+                            ))}
+                        </div>
                     </div>
-                    <div className={panelCardClassName}>
-                        <span className="mb-2 block text-sm uppercase tracking-[0.2em] text-gray-400">Upload Resume Document</span>
-                        <FileUploadControl
-                            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                            buttonLabel="Upload Resume"
-                            currentValue={resumeUrl}
-                            kind="document"
-                            onUploaded={(url) => setValue("resumeUrl", url, { shouldDirty: true, shouldValidate: true })}
-                        />
+
+                    <div className="space-y-4">
+                        <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-cyan-400/90">Hero Section</h3>
+                        <div className="grid gap-4">
+                            <label>
+                                <span className="mb-2 block text-sm font-medium text-gray-300">Hero Badge</span>
+                                <input {...register("heroBadge")} className={fieldClassName} />
+                            </label>
+                            <label>
+                                <span className="mb-2 block text-sm font-medium text-gray-300">Hero Role</span>
+                                <input {...register("heroRole")} className={fieldClassName} />
+                            </label>
+                            <label>
+                                <span className="mb-2 block text-sm font-medium text-gray-300">Hero Description</span>
+                                <textarea rows={3} {...register("heroDescription")} className={textareaClassName} />
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div className="mt-4 grid gap-4 md:grid-cols-2">
-                    <div className={panelCardClassName}>
-                        <span className="mb-2 block text-sm uppercase tracking-[0.2em] text-gray-400">About Image URL</span>
-                        <input {...register("aboutImageUrl")} className={fieldClassName} />
+
+                    <div className="space-y-4">
+                        <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-cyan-400/90">Site Descriptions</h3>
+                        <div className="grid gap-4">
+                            <label>
+                                <span className="mb-2 block text-sm font-medium text-gray-300">Site Description</span>
+                                <textarea rows={3} {...register("siteDescription")} className={textareaClassName} />
+                            </label>
+                            <label>
+                                <span className="mb-2 block text-sm font-medium text-gray-300">About Description</span>
+                                <textarea rows={3} {...register("aboutDescription")} className={textareaClassName} />
+                            </label>
+                        </div>
                     </div>
-                    <div className={panelCardClassName}>
-                        <span className="mb-2 block text-sm uppercase tracking-[0.2em] text-gray-400">Upload About Image</span>
-                        <FileUploadControl
-                            accept="image/*"
-                            buttonLabel="Upload About Image"
-                            currentValue={aboutImageUrl}
-                            kind="image"
-                            onUploaded={(url) => setValue("aboutImageUrl", url, { shouldDirty: true, shouldValidate: true })}
-                        />
+
+                    <div className="space-y-4 border-t border-cyan-700/20 pt-6">
+                        <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-cyan-400/90">Contact Section</h3>
+                        <div className="grid gap-4">
+                            <label>
+                                <span className="mb-2 block text-sm font-medium text-gray-300">Contact Title</span>
+                                <input {...register("contactTitle")} className={fieldClassName} />
+                            </label>
+                            <label>
+                                <span className="mb-2 block text-sm font-medium text-gray-300">Contact Description</span>
+                                <textarea rows={3} {...register("contactDescription")} className={textareaClassName} />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4 border-t border-cyan-700/20 pt-6">
+                        <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-cyan-400/90">Social Links</h3>
+                        <div className="grid gap-4 md:grid-cols-3">
+                            {[
+                                ["githubUrl", "GitHub"],
+                                ["linkedinUrl", "LinkedIn"],
+                                ["instagramUrl", "Instagram"],
+                            ].map(([key, label]) => (
+                                <label key={key}>
+                                    <span className="mb-2 block text-sm font-medium text-gray-300">{label} URL</span>
+                                    <input {...register(key as keyof SiteSettings)} className={fieldClassName} />
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="space-y-4 border-t border-cyan-700/20 pt-6">
+                        <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-cyan-400/90">Media & Files</h3>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className={panelCardClassName}>
+                                <span className="mb-3 block text-sm font-medium text-gray-300">Resume URL</span>
+                                <input {...register("resumeUrl")} className={fieldClassName} />
+                            </div>
+                            <div className={panelCardClassName}>
+                                <span className="mb-3 block text-sm font-medium text-gray-300">Upload Resume</span>
+                                <FileUploadControl
+                                    accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                    buttonLabel="Upload Resume"
+                                    icon={FaFile}
+                                    currentValue={resumeUrl}
+                                    kind="document"
+                                    onUploaded={(url) => setValue("resumeUrl", url, { shouldDirty: true, shouldValidate: true })}
+                                />
+                            </div>
+                        </div>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className={panelCardClassName}>
+                                <span className="mb-3 block text-sm font-medium text-gray-300">About Image URL</span>
+                                <input {...register("aboutImageUrl")} className={fieldClassName} />
+                            </div>
+                            <div className={panelCardClassName}>
+                                <span className="mb-3 block text-sm font-medium text-gray-300">Upload About Image</span>
+                                <FileUploadControl
+                                    accept="image/*"
+                                    buttonLabel="Upload Image"
+                                    icon={FaImage}
+                                    currentValue={aboutImageUrl}
+                                    kind="image"
+                                    onUploaded={(url) => setValue("aboutImageUrl", url, { shouldDirty: true, shouldValidate: true })}
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>

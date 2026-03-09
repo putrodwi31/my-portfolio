@@ -5,6 +5,7 @@ import {
     EditorCard,
     SectionCard,
     fieldClassName,
+    textareaClassName,
     parseLines,
     primaryButtonClassName,
     secondaryButtonClassName,
@@ -87,7 +88,7 @@ export function WorkExperiencesSection({
                                     onChange={(event) =>
                                         onChange(experience.id, (current) => ({ ...current, highlights: parseLines(event.target.value) }))
                                     }
-                                    className={fieldClassName}
+                                    className={textareaClassName}
                                 />
                             </label>
                         </div>

@@ -110,9 +110,9 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
 
     return (
         <div className="relative overflow-hidden rounded-[40px] border border-white/10 bg-[linear-gradient(180deg,rgba(10,14,20,0.7),rgba(5,7,10,0.8))] p-5 sm:p-8 lg:p-10 shadow-2xl backdrop-blur-3xl ring-1 ring-inset ring-white/5">
-            <div className="pointer-events-none absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-cyan-500/10 blur-[120px]" />
-            <div className="pointer-events-none absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-blue-600/10 blur-[120px]" />
-            <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[800px] w-[1000px] rounded-[100%] bg-cyan-900/5 blur-[150px]" />
+            <div className="pointer-events-none absolute -top-40 -right-40 h-125 rounded-full bg-cyan-500/10 blur-[120px]" />
+            <div className="pointer-events-none absolute -bottom-40 -left-40 h-125 rounded-full bg-blue-600/10 blur-[120px]" />
+            <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-200 w-250 rounded-[100%] bg-cyan-900/5 blur-[150px]" />
 
             <div className="relative space-y-10">
                 <DashboardHero

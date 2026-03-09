@@ -2,7 +2,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ReactElement, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { SectionCard, fieldClassName, primaryButtonClassName } from "@/components/admin/dashboard/shared";
+import { FaFileLines } from "react-icons/fa6";
+import { SectionCard, textareaClassName, primaryButtonClassName } from "@/components/admin/dashboard/shared";
 import { techStackFormSchema } from "@/validations/masters.validation";
 
 export function TechStackSection({
@@ -37,7 +38,22 @@ export function TechStackSection({
             }
         >
             <form id={formId} onSubmit={handleSubmit(({ value }) => onSave(value))}>
-                <textarea rows={10} {...register("value")} className={fieldClassName} />
+                <div className="space-y-4">
+                    <div className="relative rounded-lg border border-cyan-700/20 bg-slate-900/30 p-4 backdrop-blur-sm">
+                        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300/80 inline-flex items-center gap-2">
+                            <FaFileLines className="h-3.5 w-3.5" /> Petunjuk Format
+                        </p>
+                        <p className="text-sm text-gray-400 leading-relaxed">
+                            Masukkan satu teknologi per baris. Contoh: React, Node.js, TypeScript, Tailwind CSS
+                        </p>
+                    </div>
+                    <textarea
+                        rows={12}
+                        {...register("value")}
+                        className={textareaClassName}
+                        placeholder="React&#10;Node.js&#10;TypeScript&#10;PostgreSQL"
+                    />
+                </div>
             </form>
         </SectionCard>
     );
