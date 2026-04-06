@@ -24,7 +24,7 @@ export function SiteSettingsSection({
   status?: string;
   onSave: (value: SiteSettings) => void;
 }): ReactElement {
-  const { register, handleSubmit, reset, setValue, watch } =
+  const { register, handleSubmit, reset, setValue, watch, getValues, trigger } =
     useForm<SiteSettings>({
       resolver: zodResolver(siteSettingsFormSchema),
       defaultValues: initialSiteSettings,
@@ -37,6 +37,20 @@ export function SiteSettingsSection({
   }, [initialSiteSettings, reset]);
 
   const formId = "site-settings-form";
+
+  async function saveAfterUpload(
+    key: "resumeUrl" | "aboutImageUrl",
+    url: string,
+  ): Promise<void> {
+    setValue(key, url, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+
+    const isValid = await trigger();
+    if (!isValid) return;
+    onSave(getValues());
+  }
 
   return (
     <SectionCard
@@ -182,12 +196,9 @@ export function SiteSettingsSection({
                   icon={FaFile}
                   currentValue={resumeUrl}
                   kind="document"
-                  onUploaded={(url) =>
-                    setValue("resumeUrl", url, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    })
-                  }
+                  onUploaded={(url) => {
+                    void saveAfterUpload("resumeUrl", url);
+                  }}
                 />
               </div>
             </div>
@@ -207,12 +218,9 @@ export function SiteSettingsSection({
                   icon={FaImage}
                   currentValue={aboutImageUrl}
                   kind="image"
-                  onUploaded={(url) =>
-                    setValue("aboutImageUrl", url, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    })
-                  }
+                  onUploaded={(url) => {
+                    void saveAfterUpload("aboutImageUrl", url);
+                  }}
                 />
               </div>
             </div>
